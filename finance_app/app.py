@@ -5,25 +5,7 @@ import numpy as np
 from datetime import datetime
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
-
 import streamlit as st
-
-def authenticate():
-    with st.sidebar:
-        st.title("🔐 Login")
-        user = st.text_input("Username")
-        pwd = st.text_input("Password", type="password")
-        if st.button("Login"):
-            if user == st.secrets["auth"]["username"] and pwd == st.secrets["auth"]["password"]:
-                st.session_state["auth"] = True
-            else:
-                st.error("Invalid credentials")
-        if not st.session_state.get("auth"):
-            st.write("Stored user:", st.secrets["auth"]["username"])
-            st.write("Stored pass:", st.secrets["auth"]["password"])
-            st.stop()
-
-authenticate()
 
 DB_PATH = "personal_finance.db"
 
