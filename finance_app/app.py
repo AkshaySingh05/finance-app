@@ -19,6 +19,8 @@ def authenticate():
             else:
                 st.error("Invalid credentials")
         if not st.session_state.get("auth"):
+            st.write("Stored user:", st.secrets["auth"]["username"])
+            st.write("Stored pass:", st.secrets["auth"]["password"])
             st.stop()
 
 authenticate()
