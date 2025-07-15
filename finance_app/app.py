@@ -181,6 +181,7 @@ def main():
 
     income, expenses, debt, savings_rate, expense_ratio, savings, credit_util, debt_reduction, emergency_months = calculate_kpis(df_transactions, df_debts)
 
+    # --- KPI Metrics ---
     col1, col2, col3 = st.columns(3)
     col1.metric("Savings Rate", f"{savings_rate:.1f}%")
     col2.metric("Credit Utilization", f"{credit_util:.1f}%")
@@ -190,6 +191,7 @@ def main():
     col4.metric("Emergency Fund Coverage", f"{emergency_months:.1f} months")
     col5.metric("Net Cash Flow", f"R{income + expenses + debt:,.2f}")
 
+    # --- Forecast Chart ---
     st.subheader("📈 Expense Trend Forecast")
     months, values, future_months, forecasts = forecast_trend(df_transactions, "Expense")
     plt.figure(figsize=(10, 4))
@@ -202,7 +204,35 @@ def main():
     plt.legend()
     st.pyplot(plt)
 
-    st.success("All advanced KPIs are now active: savings, credit, debt, emergency fund.")
+    # --- Tabs for Navigation ---
+    tab1, tab2, tab3 = st.tabs(["🔁 Transactions", "💸 Budgets", "📉 Monthly Summary"])
+
+    # --- Add Transaction Form ---
+    with tab1:
+        st.header("Add New Transaction")
+        with st.form("transaction_form"):
+            date = st.date_input("Date", value=datetime.today())
+            type_ = st.selectbox("Type", ["Income", "Expense", "Debt Payment"])
+            category = st.text_input("Category")
+            amount = st.number_input("Amount", step=0.01, format="%.2f")
+            note = st.text_input("Note")
+            submitted = st.form_submit_button("Add Transaction")
+            if submitted:
+                add_transaction(date.strftime("%Y-%m-%d"), type_, category, amount, note)
+                st.success("Transaction added successfully. Please reload app to refresh KPIs.")
+
+        st.subheader("All Transactions")
+        st.dataframe(df_transactions)
+
+    # --- Budgets ---
+    with tab2:
+        st.header("Budget Overview")
+        st.dataframe(get_budget_status())
+
+    # --- Monthly Summary ---
+    with tab3:
+        st.header("Month-on-Month Financial Summary")
+        st.dataframe(get_monthly_summary())
 
 if __name__ == '__main__':
     main()
