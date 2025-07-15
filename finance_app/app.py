@@ -144,19 +144,31 @@ def calculate_kpis(df, debts):
     return income, -expenses, -debt, savings_rate, expense_ratio, savings, avg_credit_util, avg_debt_reduction, emergency_months
 
 def forecast_trend(df, category):
-    df['date'] = pd.to_datetime(df['date'])
+    if df.empty or 'date' not in df.columns or category not in df['type'].unique():
+        return [], [], [], []
+
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
     df = df[df['type'] == category].copy()
+    df = df.dropna(subset=['date'])
+
     if df.empty:
-        return [], []
+        return [], [], [], []
+
     df = df.groupby(df['date'].dt.to_period('M')).sum().reset_index()
     df['date'] = df['date'].astype(str)
     df['month_index'] = range(len(df))
+
     X = df[['month_index']]
     y = df['amount']
+
+    if len(X) < 2:
+        return df['date'].tolist(), y.tolist(), [], []
+
     model = LinearRegression()
     model.fit(X, y)
     future_index = np.array([[len(df) + i] for i in range(1, 7)])
     predictions = model.predict(future_index)
+
     return df['date'].tolist(), y.tolist(), [f"+{i}" for i in range(1, 7)], predictions.tolist()
 
 def debt_payoff_simulator(debts, method='snowball'):
