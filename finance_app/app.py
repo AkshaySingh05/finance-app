@@ -6,6 +6,8 @@ from datetime import datetime
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
+import streamlit as st
+
 def authenticate():
     with st.sidebar:
         st.title("🔐 Login")
